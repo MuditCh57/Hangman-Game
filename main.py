@@ -86,27 +86,39 @@ def draw():
 # Game Loop
 FPS = 60
 clock = pygame.time.Clock()
-run = True
-while(run):
-    clock.tick(FPS)
-    draw()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+def game_loop():
+    global hangman_img_status
+    win = True
+    run = True
+    while(run):
+        clock.tick(FPS)
+        draw()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                m_x, m_y = pygame.mouse.get_pos()
+                for letter in letters:
+                    x, y, ltr, color = letter
+                    dis = math.sqrt((x - m_x)**2 + (y - m_y)**2)
+                    if (dis < RADIUS and color != RED and color != GREEN):
+                        if (ltr not in word):
+                            hangman_img_status += 1
+                            letter[3] = RED
+                        else:
+                            letter[3] = GREEN
+                        guessed.append(ltr)
+        win = True
+        for letter in word:
+            if letter not in guessed:
+                win = False
+                break
+        if win:
+            print("win!!")
+        if (hangman_img_status >= 6):
+            print("Game Over")
             run = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            m_x, m_y = pygame.mouse.get_pos()
-            for letter in letters:
-                x, y, ltr, color = letter
-                dis = math.sqrt((x - m_x)**2 + (y - m_y)**2)
-                if (dis < RADIUS and color != RED and color != GREEN):
-                    if (ltr not in word):
-                        hangman_img_status += 1
-                        letter[3] = RED
-                    else:
-                        letter[3] = GREEN
-                    guessed.append(ltr)
-            
-    if (hangman_img_status >= 6 ):
-        print("Game Over")
-        run = False
-pygame.quit()
+    pygame.quit()
+
+if __name__ == "__main__":
+    game_loop()
