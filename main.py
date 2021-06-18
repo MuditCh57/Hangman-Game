@@ -2,7 +2,7 @@ import pygame
 import os
 import random
 import math
-
+import sys
 pygame.init()
 
 # Colors
@@ -21,6 +21,7 @@ color_list = [YELLOWISH, ORANGE, PINK, BLACK, BLUE, INDIGO, VIOLET]
 # Letter Fonts
 letter_fonts = pygame.font.SysFont("comicsansms", 24)
 word_fonts = pygame.font.SysFont("comicsansms", 33)
+RESULT_FONT = pygame.font.SysFont("comicsansms", 68)
 
 # Setup Window
 WIDTH, HEIGHT = 900, 600
@@ -95,7 +96,7 @@ def game_loop():
         draw()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 m_x, m_y = pygame.mouse.get_pos()
                 for letter in letters:
@@ -113,17 +114,28 @@ def game_loop():
             if letter not in guessed:
                 win = False
                 break
-        if win:
-            end_game_loop()
-            run = False
-        if (hangman_img_status >= 6):
-            run = False
-            end_game_loop()
+        if win or hangman_img_status >=6:
+            end_game_loop(win)
+        # if (hangman_img_status >= 6):
+        #     end_game_loop(win)
 
-    pygame.quit()
+# Reset the game
+def reset():
+    global guessed, word, title, hangman_img_status, letters
+    guessed.clear()
+    title = 'dance'
+    word = random.choice(words[topic])
+    hangman_img_status = 0
+    letters.clear()
 
+    for i in range(26):
+        x = startx + GAP * 2 + ((RADIUS * 2 + GAP) * (i % 13))
+        y = starty + ((i // 13) * (RADIUS * 2 + GAP))
+        color = BLACK
+        letters.append([x, y, chr(A + i), color])
+        
 # End Loop for end screen which show result
-def end_game_loop():
+def end_game_loop(win):
     run = True
     while(run):
         click = False
@@ -131,21 +143,34 @@ def end_game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                sys.exit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 click = True
         window.fill(WHITE)
+
+        window.blit(images[6], (350, 40))
+        # Result text
+        if win:
+            text = RESULT_FONT.render("You won!!", 1, VIOLET)
+        else:
+            text = RESULT_FONT.render("You lost!!", 1, VIOLET)
+        window.blit(text, (320, 300))
+
         # Play again button
         rect = pygame.draw.rect(window, RED, (350, 500, 220, 80))
         text = word_fonts.render("Play Again", 1, BLACK)
-        window.blit(text, (rect.x + text.get_width() / 2 - 40, rect.y + text.get_height() / 2 - 5))
+
         # Check if Button is click or not
         m_x, m_y = pygame.mouse.get_pos()
         if rect.x + rect.width > m_x > rect.x and rect.y + rect.height > m_y > rect.y :
+            text = word_fonts.render("Play Again", 1, WHITE)
             if click:
-                print("I'm clicking")
+                reset()
+                run = False
+        window.blit(text, (rect.x + text.get_width() / 2 - 40, rect.y + text.get_height() / 2 - 5))
+
         pygame.display.flip()
 
-    pygame.quit()
 if __name__ == "__main__":
     game_loop()
