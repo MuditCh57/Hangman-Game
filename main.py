@@ -61,7 +61,6 @@ word = random.choice(words[topic])
 word = word.replace(' ', '')
 word = word.replace('-', '')
 guessed = []
-print(word)
 
 # Game variables
 hangman_img_status = 0
