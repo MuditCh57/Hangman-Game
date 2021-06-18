@@ -114,11 +114,38 @@ def game_loop():
                 win = False
                 break
         if win:
-            print("win!!")
-        if (hangman_img_status >= 6):
-            print("Game Over")
+            end_game_loop()
             run = False
+        if (hangman_img_status >= 6):
+            run = False
+            end_game_loop()
+
     pygame.quit()
 
+# End Loop for end screen which show result
+def end_game_loop():
+    run = True
+    while(run):
+        click = False
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                click = True
+        window.fill(WHITE)
+        # Play again button
+        rect = pygame.draw.rect(window, RED, (350, 500, 220, 80))
+        text = word_fonts.render("Play Again", 1, BLACK)
+        window.blit(text, (rect.x + text.get_width() / 2 - 40, rect.y + text.get_height() / 2 - 5))
+        # Check if Button is click or not
+        m_x, m_y = pygame.mouse.get_pos()
+        if rect.x + rect.width > m_x > rect.x and rect.y + rect.height > m_y > rect.y :
+            if click:
+                print("I'm clicking")
+        pygame.display.flip()
+
+    pygame.quit()
 if __name__ == "__main__":
     game_loop()
